@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'medias.dart';
+import 'home.dart';
+import 'about.dart';
 
 void main() {
   runApp(const MyApp());
@@ -42,13 +44,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
     switch (selectedIndex) {
       case 0:
-        page = const Placeholder();
+        page = const Home();
         break;
       case 1:
-        page = Medias();
+        page = const Medias();
         break;
       case 2:
-        page = const Placeholder();
+        page = const About();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
@@ -75,15 +77,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     items: const [
                       BottomNavigationBarItem(
                         icon: Icon(Icons.home),
-                        label: 'Home',
+                        label: 'Accueil',
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.devices),
-                        label: 'Medias',
+                        label: 'Médias',
                       ),
                       BottomNavigationBarItem(
                         icon: Icon(Icons.info_outline),
-                        label: 'About',
+                        label: 'Infos',
                       ),
                     ],
                     currentIndex: selectedIndex,
@@ -105,15 +107,15 @@ class _MyHomePageState extends State<MyHomePage> {
                     destinations: const [
                       NavigationRailDestination(
                         icon: Icon(Icons.home),
-                        label: Text('Home'),
+                        label: Text('Accueil'),
                       ),
                       NavigationRailDestination(
                         icon: Icon(Icons.devices),
-                        label: Text('Medias'),
+                        label: Text('Médias'),
                       ),
                       NavigationRailDestination(
                         icon: Icon(Icons.info_outline),
-                        label: Text('About'),
+                        label: Text('Infos'),
                       ),
                     ],
                     selectedIndex: selectedIndex,
