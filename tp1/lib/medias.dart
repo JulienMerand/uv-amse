@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'films.dart';
+import 'series.dart';
+import 'livres.dart';
+import 'bds.dart';
+import 'sports.dart';
 
 class Medias extends StatelessWidget {
   const Medias({super.key});
@@ -32,6 +37,14 @@ class ListeMedias extends StatelessWidget {
     const Icon(Icons.sports),
   ];
 
+  final List<Widget> page = <Widget>[
+    Films(),
+    Series(),
+    Livres(),
+    BDs(),
+    Sports(),
+  ];
+
   @override
   Widget build(BuildContext context) {
     return ListView(
@@ -42,7 +55,8 @@ class ListeMedias extends StatelessWidget {
               leading: icons[index],
               title: noms[index],
               onTap: () {
-                print(noms[index]);
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => page[index]));
               },
             ),
           );
