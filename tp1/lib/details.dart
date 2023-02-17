@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'main.dart';
 
 class Details extends StatelessWidget {
   const Details(
@@ -13,42 +15,69 @@ class Details extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    IconData icon;
+    if (appState.favtitre.contains(titre)) {
+      icon = Icons.favorite;
+    } else {
+      icon = Icons.favorite_border;
+    }
+
     return Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 0, 40, 72),
         leading: const BackButton(),
       ),
-      body: Column(
-        children: <Widget>[
-          Container(
-            color: const Color.fromARGB(255, 161, 211, 252),
-            child: Container(
-              margin: const EdgeInsets.all(50.0),
+      body: Container(
+        padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 10.0),
+        child: Column(
+          children: [
+            Expanded(
+              flex: 3,
+              child: image,
+            ),
+            Expanded(
+              flex: 1,
               child: Row(
-                children: <Widget>[
-                  Container(
-                    margin: const EdgeInsets.only(right: 10.0),
-                    padding: const EdgeInsets.all(10.0),
-                    child: image,
-                  ),
-                  Container(
-                    margin: const EdgeInsets.only(left: 10.0),
-                    padding: const EdgeInsets.all(10.0),
-                    child: Text(
-                      titre,
-                      style: const TextStyle(fontSize: 30),
+                children: [
+                  Expanded(
+                    flex: 8,
+                    child: Center(
+                      child: Text(
+                        titre,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
                   ),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      icon: Icon(icon),
+                      label: const Text('Like'),
+                      onPressed: () {
+                        appState.toggleFavTitre(titre);
+                        var current = {};
+                        current["titre"] = titre;
+                        current["image"] = image;
+                        current["info"] = info;
+                        appState.toggleFavorite(current);
+                      },
+                    ),
+                  )
                 ],
               ),
             ),
-          ),
-          Container(
-            margin: const EdgeInsets.only(
-                left: 50.0, right: 50.0, top: 20.0, bottom: 20.0),
-            padding: const EdgeInsets.all(10.0),
-            child: Text(info),
-          ),
-        ],
+            Expanded(
+              flex: 6,
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(10.0),
+                child: Text(info),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

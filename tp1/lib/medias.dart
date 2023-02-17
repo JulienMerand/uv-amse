@@ -12,7 +12,9 @@ class Medias extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         home: Scaffold(
-      appBar: AppBar(title: const Text("Liste des Médias")),
+      appBar: AppBar(
+          backgroundColor: const Color.fromARGB(255, 0, 40, 72),
+          title: const Text("Liste des Médias")),
       body: ListeMedias(),
     ));
   }

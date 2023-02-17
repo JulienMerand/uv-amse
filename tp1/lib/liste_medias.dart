@@ -16,6 +16,7 @@ class ListeOfMedias extends StatelessWidget {
     return MaterialApp(
         home: Scaffold(
       appBar: AppBar(
+        backgroundColor: const Color.fromARGB(255, 0, 40, 72),
         title: Text(intitule),
         leading: IconButton(
           icon: const Icon(Icons.keyboard_arrow_left),

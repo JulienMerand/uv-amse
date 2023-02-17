@@ -17,14 +17,36 @@ class MyApp extends StatelessWidget {
       title: 'App TP1 (à changer)',
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
+        colorScheme: ColorScheme.fromSeed(
+            seedColor: const Color.fromARGB(255, 0, 40, 72)),
       ),
       home: const MyHomePage(title: 'App TP1'),
     );
   }
 }
 
-class MyAppState extends ChangeNotifier {}
+class MyAppState extends ChangeNotifier {
+  var favtitre = <String>[];
+  var favorites = <Map>[];
+
+  void toggleFavTitre(current) {
+    if (favtitre.contains(current)) {
+      favtitre.remove(current);
+    } else {
+      favtitre.add(current);
+    }
+    notifyListeners();
+  }
+
+  void toggleFavorite(current) {
+    if (favorites.contains(current)) {
+      favorites.remove(current);
+    } else {
+      favorites.add(current);
+    }
+    notifyListeners();
+  }
+}
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});

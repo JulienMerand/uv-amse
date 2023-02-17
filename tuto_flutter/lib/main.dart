@@ -109,6 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
 class FavoritesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Provider.of<MyAppState>(context);
     var appState = context.watch<MyAppState>();
 
     if (appState.favorites.isEmpty) {
