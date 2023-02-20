@@ -42,7 +42,7 @@ class Details extends StatelessWidget {
               child: Row(
                 children: [
                   Expanded(
-                    flex: 8,
+                    flex: 7,
                     child: Center(
                       child: Text(
                         titre,
@@ -52,9 +52,10 @@ class Details extends StatelessWidget {
                     ),
                   ),
                   Expanded(
-                    flex: 2,
+                    flex: 3,
                     child: ElevatedButton.icon(
                       icon: Icon(icon),
+                      // icon: const Icon(Icons.favorite),
                       label: const Text('Like'),
                       onPressed: () {
                         appState.toggleFavTitre(titre);

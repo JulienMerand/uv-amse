@@ -14,21 +14,24 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'App TP1 (à changer)',
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color.fromARGB(255, 0, 40, 72)),
+    return ChangeNotifierProvider(
+      create: (context) => MyAppState(),
+      child: MaterialApp(
+        title: 'App TP1 (à changer)',
+        theme: ThemeData(
+          useMaterial3: true,
+          colorScheme: ColorScheme.fromSeed(
+              seedColor: const Color.fromARGB(255, 0, 40, 72)),
+        ),
+        home: const MyHomePage(title: 'App TP1'),
       ),
-      home: const MyHomePage(title: 'App TP1'),
     );
   }
 }
 
 class MyAppState extends ChangeNotifier {
   var favtitre = <String>[];
-  var favorites = <Map>[];
+  var favorites = [];
 
   void toggleFavTitre(current) {
     if (favtitre.contains(current)) {
