@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:tp2/exo5.dart';
 import 'exo1.dart';
 import 'exo2.dart';
 import 'exo4.dart';
+import 'exo5.dart';
+import 'exo6.dart';
+import 'exo7.dart';
 
 void main() {
   runApp(const MyApp());
@@ -77,11 +79,13 @@ class Exos {
 }
 
 List exos = [
-  Exos(
-      "Exercice 1", "Affichage de l'image ", (context) => const DisplayImage()),
-  Exos("Exercice 2", "Resize / Rotation ", (context) => const Transformation()),
+  Exos("Exercice 1", "Affichage de l'image", (context) => const DisplayImage()),
+  Exos("Exercice 2", "Resize / Rotation", (context) => const Transformation()),
   Exos("Exercice 4", "Affichage d'une tuile",
       (context) => const DisplayTileWidget()),
-  Exos("Exercice 5", "Génération du plateau de tuiles ",
+  Exos("Exercice 5", "Génération du plateau de tuiles",
       (context) => const BoardConfig()),
+  Exos("Exercice 6", "Echange entre 2 tuiles",
+      (context) => const PositionedTiles()),
+  Exos("Exercice 7", "Jeu du Taquin", (context) => const Taquin()),
 ];

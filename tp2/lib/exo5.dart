@@ -11,8 +11,24 @@ class BoardConfig extends StatefulWidget {
 class _BoardConfigState extends State<BoardConfig> {
   double _currentSliderValue = 3.0;
 
-  Tile tile = Tile(
-      imageURL: 'https://picsum.photos/512', alignment: const Alignment(0, 0));
+  List<Widget> tiles(sliderValue) {
+    return List.generate(sliderValue.round() * sliderValue.round(), (index) {
+      Tile tile = Tile(
+          imageURL: 'https://picsum.photos/512',
+          alignment: Alignment(
+              (2 / (sliderValue.round() - 1)) * (index % sliderValue.round()) -
+                  1,
+              (2 / (sliderValue.round() - 1)) * (index ~/ sliderValue.round()) -
+                  1),
+          factor: sliderValue.round());
+      return InkWell(
+        child: tile.croppedImageTile(),
+        onTap: () {
+          print("tapped on tile $index");
+        },
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,16 +50,10 @@ class _BoardConfigState extends State<BoardConfig> {
               child: GridView.count(
                 primary: false,
                 padding: const EdgeInsets.all(20),
-                crossAxisSpacing: 10,
-                mainAxisSpacing: 10,
+                crossAxisSpacing: 2,
+                mainAxisSpacing: 2,
                 crossAxisCount: _currentSliderValue.round(),
-                children: List.generate(
-                    _currentSliderValue.round() * _currentSliderValue.round(),
-                    (index) {
-                  return Container(
-                    color: Colors.teal,
-                  );
-                }),
+                children: tiles(_currentSliderValue),
               ),
             ),
             const SizedBox(height: 10),
