@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'exo4.dart';
 
@@ -26,27 +28,23 @@ class Taquin extends StatefulWidget {
 }
 
 class _Taquin extends State<Taquin> {
-  double currentSliderValue = 3.0;
+  double gridvalue = 3.0;
   int indexEmpty = 0;
   Widget emptytile = Container(
     color: Colors.white,
   );
-  late List<Widget> tiles;
+  List<Widget> tiles = [];
 
-  List<Widget> initlist() {
+  List<Widget> initlist(int gridvalue) {
     List<Widget> tiles = List.generate(
-        currentSliderValue.round() * currentSliderValue.round(),
+        gridvalue * gridvalue,
         (index) => TileWidget(
             tile: Tile(
                 imageURL: 'https://picsum.photos/512',
                 alignment: Alignment(
-                    (2 / (currentSliderValue.round() - 1)) *
-                            (index % currentSliderValue.round()) -
-                        1,
-                    (2 / (currentSliderValue.round() - 1)) *
-                            (index ~/ currentSliderValue.round()) -
-                        1),
-                factor: currentSliderValue.round()),
+                    (2 / (gridvalue - 1)) * (index % gridvalue) - 1,
+                    (2 / (gridvalue - 1)) * (index ~/ gridvalue) - 1),
+                factor: gridvalue),
             index: index));
     tiles.removeAt(indexEmpty);
     tiles.insert(indexEmpty, emptytile);
@@ -54,10 +52,34 @@ class _Taquin extends State<Taquin> {
     return tiles;
   }
 
+  List<Widget> melanger(List<Widget> tiles, int nbcoups) {
+    final random = Random();
+    int index;
+    int oldindex = indexEmpty;
+    List listindex;
+    for (var i = 0; i < nbcoups; i++) {
+      listindex = [
+        indexEmpty - 1,
+        indexEmpty + 1,
+        indexEmpty - gridvalue.round(),
+        indexEmpty + gridvalue.round()
+      ];
+      index = listindex[random.nextInt(listindex.length)];
+      while ((index < 0) |
+          (index >= gridvalue.round() * gridvalue.round()) |
+          (index == oldindex)) {
+        index = listindex[random.nextInt(listindex.length)];
+      }
+      swaptiles(index);
+      oldindex = index;
+    }
+    return tiles;
+  }
+
   @override
   void initState() {
     super.initState();
-    tiles = initlist();
+    tiles = initlist(gridvalue.round());
   }
 
   @override
@@ -74,6 +96,40 @@ class _Taquin extends State<Taquin> {
             },
           ),
         ),
+        floatingActionButton: FloatingActionButton(
+          child: const Text("Start"),
+          onPressed: () {
+            setState(() {
+              tiles = initlist(gridvalue.round());
+              tiles = melanger(tiles, 10);
+            });
+          },
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+        bottomNavigationBar: BottomAppBar(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(width: 20),
+              const Text(
+                "Taille : ",
+                style: TextStyle(fontSize: 20),
+              ),
+              Slider(
+                value: gridvalue,
+                min: 2,
+                max: 10,
+                divisions: 8,
+                label: gridvalue.round().toString(),
+                onChanged: (double value) {
+                  setState(() {
+                    gridvalue = value;
+                  });
+                },
+              ),
+            ],
+          ),
+        ),
         body: Column(
           children: [
             Expanded(
@@ -82,44 +138,20 @@ class _Taquin extends State<Taquin> {
                 padding: const EdgeInsets.all(20),
                 crossAxisSpacing: 2,
                 mainAxisSpacing: 2,
-                crossAxisCount: currentSliderValue.round(),
+                crossAxisCount: gridvalue.round(),
                 children: List.generate(
-                  currentSliderValue.round() * currentSliderValue.round(),
+                  gridvalue.round() * gridvalue.round(),
                   (index) => InkWell(
                       child: tiles[index],
                       onTap: () {
                         if (index != indexEmpty) {
                           swaptiles(index);
                         } else {
-                          print("case vide sélectionné !");
+                          print("Mouvement impossible !");
                         }
                       }),
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                const SizedBox(width: 20),
-                const Text(
-                  "Taille : ",
-                  style: TextStyle(fontSize: 20),
-                ),
-                Slider(
-                  value: currentSliderValue,
-                  min: 2,
-                  max: 10,
-                  divisions: 8,
-                  label: currentSliderValue.round().toString(),
-                  onChanged: (double value) {
-                    setState(() {
-                      currentSliderValue = value;
-                      tiles = initlist();
-                    });
-                  },
-                ),
-              ],
             ),
           ],
         ),
@@ -130,16 +162,14 @@ class _Taquin extends State<Taquin> {
   swaptiles(index) {
     if ((index != indexEmpty - 1) &
         (index != indexEmpty + 1) &
-        (index != indexEmpty + currentSliderValue) &
-        (index != indexEmpty - currentSliderValue)) {
+        (index != indexEmpty + gridvalue.round()) &
+        (index != indexEmpty - gridvalue.round())) {
       print("Mouvement impossible");
     } else {
       setState(() {
-        print("clicked on $index");
         Widget temp = tiles[index];
         tiles[index] = tiles[indexEmpty];
         tiles[indexEmpty] = temp;
-
         indexEmpty = index;
       });
     }
