@@ -65,17 +65,19 @@ class _BoardConfigState extends State<BoardConfig> {
                   "Taille : ",
                   style: TextStyle(fontSize: 20),
                 ),
-                Slider(
-                  value: _currentSliderValue,
-                  min: 2,
-                  max: 10,
-                  divisions: 8,
-                  label: _currentSliderValue.round().toString(),
-                  onChanged: (double value) {
-                    setState(() {
-                      _currentSliderValue = value;
-                    });
-                  },
+                Expanded(
+                  child: Slider(
+                    value: _currentSliderValue,
+                    min: 2,
+                    max: 10,
+                    divisions: 8,
+                    label: _currentSliderValue.round().toString(),
+                    onChanged: (double value) {
+                      setState(() {
+                        _currentSliderValue = value;
+                      });
+                    },
+                  ),
                 ),
               ],
             ),
