@@ -13,9 +13,6 @@ class TileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       child: tile.croppedImageTile(),
-      // onTap: () {
-      //   print("tapped on tile $index");
-      // },
     );
   }
 }
@@ -30,24 +27,32 @@ class Taquin extends StatefulWidget {
 class _Taquin extends State<Taquin> {
   double _gridvalue = 3.0;
   int indexEmpty = 0;
-  Widget emptytile = Container(
-    color: Colors.white,
-  );
-  List<Widget> tiles = [];
+  List emptytile = [
+    Container(
+      color: Colors.white,
+    ),
+    0
+  ];
+  List tiles = [];
   bool start = false;
   String txtstart = "Start";
+  String URL = 'https://picsum.photos/512';
+  String difficulte = "Easy";
+  List listdifficulte;
 
-  List<Widget> initlist(int gridvalue) {
-    List<Widget> ti = List.generate(
-        gridvalue * gridvalue,
-        (index) => TileWidget(
-            tile: Tile(
-                imageURL: 'https://picsum.photos/512',
-                alignment: Alignment(
-                    (2 / (gridvalue - 1)) * (index % gridvalue) - 1,
-                    (2 / (gridvalue - 1)) * (index ~/ gridvalue) - 1),
-                factor: gridvalue),
-            index: index));
+  List initlist(int gridvalue) {
+    List ti = [];
+    for (var index = 0; index < gridvalue * gridvalue; index++) {
+      TileWidget tw = TileWidget(
+          tile: Tile(
+              imageURL: URL,
+              alignment: Alignment(
+                  (2 / (gridvalue - 1)) * (index % gridvalue) - 1,
+                  (2 / (gridvalue - 1)) * (index ~/ gridvalue) - 1),
+              factor: gridvalue),
+          index: index);
+      ti.add([tw, index]);
+    }
     ti.removeAt(indexEmpty);
     ti.insert(indexEmpty, emptytile);
     return ti;
@@ -57,18 +62,34 @@ class _Taquin extends State<Taquin> {
     return List.generate(
       gridvalue.round() * gridvalue.round(),
       (index) => InkWell(
-          child: tiles[index],
+          child: tiles[index][0],
           onTap: () {
             swaptiles(index);
+            if (gagne()) {
+              print(tiles);
+              print("Gagné !");
+            }
           }),
     );
   }
 
-  List<Widget> melanger(List<Widget> tiles, int nbcoups) {
+  void melanger(List tiles, String diff) {
     final random = Random();
     int index;
     int oldindex = indexEmpty;
     List listindex;
+    int nbcoups = 0;
+
+    if(diff=="Easy"){
+      nbcoups = 20;
+    }
+    else if (diff == "Medium"){
+      nbcoups = 50;
+    }
+    else if (diff == "Hard"){
+      nbcoups = 100;
+    }
+
     for (var i = 0; i < nbcoups; i++) {
       listindex = [
         indexEmpty - 1,
@@ -77,16 +98,23 @@ class _Taquin extends State<Taquin> {
         indexEmpty + _gridvalue.round()
       ];
       index = listindex[random.nextInt(listindex.length)];
-      while ((index == oldindex) | (index < 0) | (index >= _gridvalue)) {
+      while ((index == oldindex) |
+          (index < 0) |
+          (index >= _gridvalue * _gridvalue)) {
         index = listindex[random.nextInt(listindex.length)];
       }
+      oldindex = indexEmpty;
+      // print("je swap $index avec la case vide $indexEmpty, oldindex = $oldindex");
       bool ret = swaptiles(index);
       if (!ret) {
         i--;
+        setState(() {
+          indexEmpty = oldindex;
+        });
+        // print("swap impossible, case vide : $indexEmpty");
       }
-      oldindex = index;
     }
-    return tiles;
+    print("Grille melangé ! A vous de jouer !");
   }
 
   @override
@@ -100,7 +128,7 @@ class _Taquin extends State<Taquin> {
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
-          title: const Text("Génération du plateau de tuiles "),
+          title: const Text("Jeu du Taquin"),
           backgroundColor: Colors.teal,
           leading: IconButton(
             icon: const Icon(Icons.keyboard_arrow_left),
@@ -113,15 +141,16 @@ class _Taquin extends State<Taquin> {
           child: Text(txtstart),
           onPressed: () {
             setState(() {
-              start = start == false ? true : false;
+              start = !start;
               txtstart = txtstart == "Start" ? "Stop" : "Start";
               if (start) {
-                //tiles = melanger(tiles, 10);
+                melanger(tiles, difficulte);
               }
               if (!start) {
                 indexEmpty = 0;
+                tiles = initlist(_gridvalue.round());
+                tileslist(_gridvalue.round());
               }
-              tiles = initlist(_gridvalue.round());
             });
           },
         ),
@@ -130,7 +159,7 @@ class _Taquin extends State<Taquin> {
           mainAxisAlignment: MainAxisAlignment.end,
           mainAxisSize: MainAxisSize.min,
           children: [
-            const SizedBox(height: 10.0),
+            const SizedBox(height: 15.0),
             BottomAppBar(
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -140,19 +169,23 @@ class _Taquin extends State<Taquin> {
                     "Taille : ",
                     style: TextStyle(fontSize: 17),
                   ),
-                  Slider(
-                    value: _gridvalue,
-                    min: 2,
-                    max: 10,
-                    divisions: 8,
-                    label: _gridvalue.round().toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        if (!start) {
-                          _gridvalue = value;
-                        }
-                      });
-                    },
+                  Expanded(
+                    child: Slider(
+                      value: _gridvalue,
+                      min: 2,
+                      max: 10,
+                      divisions: 8,
+                      label: _gridvalue.round().toString(),
+                      onChanged: (double value) {
+                        setState(() {
+                          if (!start) {
+                            _gridvalue = value;
+                            tiles = initlist(_gridvalue.round());
+                            tileslist(_gridvalue.round());
+                          }
+                        });
+                      },
+                    ),
                   ),
                 ],
               ),
@@ -163,6 +196,7 @@ class _Taquin extends State<Taquin> {
         body: Column(
           children: [
             Expanded(
+              flex: 70,
               child: GridView.count(
                 primary: false,
                 padding: const EdgeInsets.all(20),
@@ -172,6 +206,37 @@ class _Taquin extends State<Taquin> {
                 children: tileslist(_gridvalue.round()),
               ),
             ),
+            Expanded(
+              flex: 25,
+              child: Row(
+                children: [
+                  DropdownButton<String>(
+                    value: difficulte,
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    style: const TextStyle(color: Colors.deepPurple),
+                    underline: Container(
+                      height: 2,
+                      color: Colors.deepPurpleAccent,
+                    ),
+                    onChanged: (String? value) {
+                      // This is called when the user selects an item.
+                      setState(() {
+                        difficulte = value!;
+                      });
+                    },
+                    items: listdifficulte.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
+                      );
+                    }).toList(),
+                  );
+                  SizedBox(child: Image.network(URL, fit: BoxFit.contain)),
+                ],
+              ),
+            ),
+            const Expanded(flex: 5, child: SizedBox()),
           ],
         ),
       ),
@@ -204,7 +269,7 @@ class _Taquin extends State<Taquin> {
       }
       if (indexpossible.contains(index)) {
         setState(() {
-          Widget temp = tiles[index];
+          List temp = tiles[index];
           tiles[index] = tiles[indexEmpty];
           tiles[indexEmpty] = temp;
           indexEmpty = index;
@@ -217,5 +282,14 @@ class _Taquin extends State<Taquin> {
       print("Mouvement impossible ! ");
       return false;
     }
+  }
+
+  bool gagne() {
+    for (var i = 0; i < _gridvalue.round(); i++) {
+      if (i != tiles[i][1]) {
+        return false;
+      }
+    }
+    return true;
   }
 }
