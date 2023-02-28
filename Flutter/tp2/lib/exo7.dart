@@ -36,16 +36,32 @@ class _Taquin extends State<Taquin> {
   List tiles = [];
   bool start = false;
   String txtstart = "Start";
-  String URL = 'https://picsum.photos/512';
   String difficulte = "Easy";
-  List listdifficulte;
+  List listdifficulte = ["Easy", "Medium", "Hard"];
+  String urlimg = "";
+
+  List<DropdownMenuItem<String>> get dropdownItems {
+    List<DropdownMenuItem<String>> menuItems = [
+      const DropdownMenuItem(value: "Easy", child: Text("Easy")),
+      const DropdownMenuItem(value: "Medium", child: Text("Medium")),
+      const DropdownMenuItem(value: "Hard", child: Text("Hard")),
+    ];
+    return menuItems;
+  }
+
+  String url() {
+    Random random = Random();
+    int id = random.nextInt(1001);
+    String res = "https://picsum.photos/id/${id}/512/";
+    return res;
+  }
 
   List initlist(int gridvalue) {
     List ti = [];
     for (var index = 0; index < gridvalue * gridvalue; index++) {
       TileWidget tw = TileWidget(
           tile: Tile(
-              imageURL: URL,
+              imageURL: urlimg,
               alignment: Alignment(
                   (2 / (gridvalue - 1)) * (index % gridvalue) - 1,
                   (2 / (gridvalue - 1)) * (index ~/ gridvalue) - 1),
@@ -66,7 +82,6 @@ class _Taquin extends State<Taquin> {
           onTap: () {
             swaptiles(index);
             if (gagne()) {
-              print(tiles);
               print("Gagné !");
             }
           }),
@@ -80,14 +95,18 @@ class _Taquin extends State<Taquin> {
     List listindex;
     int nbcoups = 0;
 
-    if(diff=="Easy"){
-      nbcoups = 20;
-    }
-    else if (diff == "Medium"){
-      nbcoups = 50;
-    }
-    else if (diff == "Hard"){
-      nbcoups = 100;
+    switch (diff) {
+      case "Easy":
+        nbcoups = 10 * _gridvalue.round() * _gridvalue.round();
+        break;
+      case "Medium":
+        nbcoups = 100 * _gridvalue.round() * _gridvalue.round();
+        break;
+      case "Hard":
+        nbcoups = 500 * _gridvalue.round() * _gridvalue.round();
+        break;
+      default:
+        throw UnimplementedError('no widget for $diff');
     }
 
     for (var i = 0; i < nbcoups; i++) {
@@ -120,6 +139,7 @@ class _Taquin extends State<Taquin> {
   @override
   void initState() {
     super.initState();
+    urlimg = url();
     tiles = initlist(_gridvalue.round());
   }
 
@@ -138,6 +158,7 @@ class _Taquin extends State<Taquin> {
           ),
         ),
         floatingActionButton: FloatingActionButton(
+          backgroundColor: Colors.teal,
           child: Text(txtstart),
           onPressed: () {
             setState(() {
@@ -166,7 +187,7 @@ class _Taquin extends State<Taquin> {
                 children: [
                   const SizedBox(width: 20),
                   const Text(
-                    "Taille : ",
+                    "Size : ",
                     style: TextStyle(fontSize: 17),
                   ),
                   Expanded(
@@ -176,6 +197,9 @@ class _Taquin extends State<Taquin> {
                       max: 10,
                       divisions: 8,
                       label: _gridvalue.round().toString(),
+                      activeColor: Colors.teal,
+                      inactiveColor: Colors.teal[100],
+                      thumbColor: Colors.teal,
                       onChanged: (double value) {
                         setState(() {
                           if (!start) {
@@ -185,6 +209,33 @@ class _Taquin extends State<Taquin> {
                           }
                         });
                       },
+                    ),
+                  ),
+                  TextButton(
+                    // style: TextButton.styleFrom(
+                    //   textStyle:
+                    //       const TextStyle(fontSize: 15, color: Colors.black),
+                    // ),
+                    onPressed: () {
+                      if (!start) {
+                        setState(() {
+                          urlimg = url();
+                          tiles = initlist(_gridvalue.round());
+                        });
+                      }
+                    },
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.replay,
+                          color: Colors.black,
+                        ),
+                        Text(" Reload",
+                            style: TextStyle(
+                              fontSize: 15,
+                              color: Colors.black,
+                            )),
+                      ],
                     ),
                   ),
                 ],
@@ -210,29 +261,43 @@ class _Taquin extends State<Taquin> {
               flex: 25,
               child: Row(
                 children: [
-                  DropdownButton<String>(
-                    value: difficulte,
-                    icon: const Icon(Icons.arrow_downward),
-                    elevation: 16,
-                    style: const TextStyle(color: Colors.deepPurple),
-                    underline: Container(
-                      height: 2,
-                      color: Colors.deepPurpleAccent,
+                  const Expanded(flex: 10, child: SizedBox()),
+                  Expanded(
+                    flex: 25,
+                    child: Column(
+                      children: [
+                        DropdownButton<String>(
+                          value: difficulte,
+                          icon: const Icon(Icons.arrow_downward),
+                          elevation: 8,
+                          style: const TextStyle(color: Colors.deepPurple),
+                          underline: Container(
+                            height: 2,
+                            color: Colors.deepPurpleAccent,
+                          ),
+                          onChanged: (String? value) {
+                            // This is called when the user selects an item.
+                            setState(() {
+                              difficulte = value!;
+                            });
+                          },
+                          items: dropdownItems,
+                        ),
+                      ],
                     ),
-                    onChanged: (String? value) {
-                      // This is called when the user selects an item.
-                      setState(() {
-                        difficulte = value!;
-                      });
-                    },
-                    items: listdifficulte.map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
-                        value: value,
-                        child: Text(value),
-                      );
-                    }).toList(),
-                  );
-                  SizedBox(child: Image.network(URL, fit: BoxFit.contain)),
+                  ),
+                  const Expanded(flex: 5, child: SizedBox()),
+                  Expanded(
+                      flex: 60,
+                      child: SizedBox(
+                          child: Image.network(
+                        urlimg,
+                        fit: BoxFit.contain,
+                        errorBuilder: (BuildContext context, Object exception,
+                            StackTrace? stackTrace) {
+                          return Image.network('https://picsum.photos/512');
+                        },
+                      ))),
                 ],
               ),
             ),
@@ -285,7 +350,7 @@ class _Taquin extends State<Taquin> {
   }
 
   bool gagne() {
-    for (var i = 0; i < _gridvalue.round(); i++) {
+    for (var i = 0; i < _gridvalue.round() * _gridvalue.round(); i++) {
       if (i != tiles[i][1]) {
         return false;
       }

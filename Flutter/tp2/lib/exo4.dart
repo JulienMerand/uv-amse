@@ -15,7 +15,13 @@ class Tile {
           alignment: alignment,
           widthFactor: 1 / factor,
           heightFactor: 1 / factor,
-          child: Image.network(imageURL),
+          child: Image.network(
+            imageURL,
+            errorBuilder: (BuildContext context, Object exception,
+                StackTrace? stackTrace) {
+              return Image.network('https://picsum.photos/512');
+            },
+          ),
         ),
       ),
     );
