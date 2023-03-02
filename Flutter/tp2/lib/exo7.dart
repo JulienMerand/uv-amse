@@ -1,5 +1,5 @@
 import 'dart:math';
-
+import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'exo4.dart';
 
@@ -35,10 +35,13 @@ class _Taquin extends State<Taquin> {
   ];
   List tiles = [];
   bool start = false;
+  int nombrecoups = 0;
   String txtstart = "Start";
   String difficulte = "Easy";
   List listdifficulte = ["Easy", "Medium", "Hard"];
   String urlimg = "";
+  late ConfettiController _controllerCenter;
+  List<List<Widget>> historique = [];
 
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
@@ -74,18 +77,21 @@ class _Taquin extends State<Taquin> {
     return ti;
   }
 
-  List<Widget> tileslist(gridvalue) {
-    return List.generate(
+  List<Widget> tileslist(gridvalue, nombrecoups) {
+    List<Widget> cur = List.generate(
       gridvalue.round() * gridvalue.round(),
       (index) => InkWell(
           child: tiles[index][0],
           onTap: () {
-            swaptiles(index);
-            if (gagne()) {
+            if (!gagne()) {
+              swaptiles(index);
+            }
+            if (start & gagne()) {
               print("Gagné !");
             }
           }),
     );
+    return cur;
   }
 
   void melanger(List tiles, String diff) {
@@ -141,6 +147,14 @@ class _Taquin extends State<Taquin> {
     super.initState();
     urlimg = url();
     tiles = initlist(_gridvalue.round());
+    _controllerCenter =
+        ConfettiController(duration: const Duration(seconds: 3));
+  }
+
+  @override
+  void dispose() {
+    _controllerCenter.dispose();
+    super.dispose();
   }
 
   @override
@@ -163,14 +177,17 @@ class _Taquin extends State<Taquin> {
           onPressed: () {
             setState(() {
               start = !start;
-              txtstart = txtstart == "Start" ? "Stop" : "Start";
               if (start) {
                 melanger(tiles, difficulte);
+                txtstart = "Stop";
+                nombrecoups = 0;
               }
               if (!start) {
+                txtstart = "Start";
                 indexEmpty = 0;
+                nombrecoups = 0;
                 tiles = initlist(_gridvalue.round());
-                tileslist(_gridvalue.round());
+                tileslist(_gridvalue.round(), nombrecoups);
               }
             });
           },
@@ -182,128 +199,236 @@ class _Taquin extends State<Taquin> {
           children: [
             const SizedBox(height: 15.0),
             BottomAppBar(
+              height: 50.0,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const SizedBox(width: 20),
-                  const Text(
-                    "Size : ",
-                    style: TextStyle(fontSize: 17),
-                  ),
-                  Expanded(
-                    child: Slider(
-                      value: _gridvalue,
-                      min: 2,
-                      max: 10,
-                      divisions: 8,
-                      label: _gridvalue.round().toString(),
-                      activeColor: Colors.teal,
-                      inactiveColor: Colors.teal[100],
-                      thumbColor: Colors.teal,
-                      onChanged: (double value) {
-                        setState(() {
-                          if (!start) {
-                            _gridvalue = value;
-                            tiles = initlist(_gridvalue.round());
-                            tileslist(_gridvalue.round());
-                          }
-                        });
-                      },
-                    ),
-                  ),
-                  TextButton(
-                    // style: TextButton.styleFrom(
-                    //   textStyle:
-                    //       const TextStyle(fontSize: 15, color: Colors.black),
-                    // ),
-                    onPressed: () {
-                      if (!start) {
-                        setState(() {
-                          urlimg = url();
-                          tiles = initlist(_gridvalue.round());
-                        });
-                      }
-                    },
-                    child: Row(
-                      children: const [
-                        Icon(
-                          Icons.replay,
-                          color: Colors.black,
+                children: start
+                    ? (gagne()
+                        ? [
+                            Expanded(
+                                child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 10.0, right: 10.0),
+                                  child: Text("Nombre de coups : $nombrecoups",
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                ),
+                                const Expanded(child: SizedBox()),
+                                Container(
+                                  margin: const EdgeInsets.only(
+                                      left: 10.0, right: 10.0),
+                                  child: const Text(
+                                    "Victoire !!",
+                                    textAlign: TextAlign.end,
+                                    style: TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color.fromARGB(255, 69, 249, 96),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ))
+                          ]
+                        : [
+                            Expanded(
+                                child: Row(
+                              children: [
+                                Container(
+                                  margin: const EdgeInsets.only(left: 10),
+                                  color: Colors.white,
+                                  child: Text("Nombre de coups : $nombrecoups",
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold,
+                                      )),
+                                ),
+                                const Expanded(child: SizedBox()),
+                                (nombrecoups == 0)
+                                    ? const SizedBox()
+                                    : TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            if (nombrecoups > 0) {
+                                              nombrecoups--;
+                                              print("Mouvement précédent");
+                                            }
+                                          });
+                                        },
+                                        child: Row(
+                                          children: const [
+                                            Icon(
+                                              Icons.replay,
+                                              color: Colors.black,
+                                            ),
+                                            Text(" Annuler",
+                                                style: TextStyle(
+                                                  fontSize: 15,
+                                                  color: Colors.black,
+                                                )),
+                                          ],
+                                        ),
+                                      ),
+                              ],
+                            ))
+                          ])
+                    : [
+                        const SizedBox(width: 20),
+                        const Text(
+                          "Size : ",
+                          style: TextStyle(fontSize: 17),
                         ),
-                        Text(" Reload",
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                            )),
+                        Expanded(
+                          child: Slider(
+                            value: _gridvalue,
+                            min: 2,
+                            max: 10,
+                            divisions: 8,
+                            label: _gridvalue.round().toString(),
+                            activeColor: Colors.teal,
+                            inactiveColor: Colors.teal[100],
+                            thumbColor: Colors.teal,
+                            onChanged: (double value) {
+                              setState(() {
+                                if (!start) {
+                                  _gridvalue = value;
+                                  tiles = initlist(_gridvalue.round());
+                                  tileslist(_gridvalue.round(), nombrecoups);
+                                }
+                              });
+                            },
+                          ),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            if (!start) {
+                              setState(() {
+                                urlimg = url();
+                                tiles = initlist(_gridvalue.round());
+                              });
+                            }
+                          },
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.replay,
+                                color: Colors.black,
+                              ),
+                              Text(" Reload",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.black,
+                                  )),
+                            ],
+                          ),
+                        ),
                       ],
-                    ),
-                  ),
-                ],
               ),
             ),
             const SizedBox(height: 5.0),
           ],
         ),
-        body: Column(
-          children: [
-            Expanded(
-              flex: 70,
-              child: GridView.count(
-                primary: false,
-                padding: const EdgeInsets.all(20),
-                crossAxisSpacing: 2,
-                mainAxisSpacing: 2,
-                crossAxisCount: _gridvalue.round(),
-                children: tileslist(_gridvalue.round()),
+        body: Stack(children: [
+          Column(
+            children: [
+              Expanded(
+                flex: 70,
+                child: GridView.count(
+                  primary: false,
+                  padding: const EdgeInsets.all(20),
+                  crossAxisSpacing: 2,
+                  mainAxisSpacing: 2,
+                  crossAxisCount: _gridvalue.round(),
+                  children: tileslist(_gridvalue.round(), nombrecoups),
+                ),
               ),
-            ),
-            Expanded(
-              flex: 25,
-              child: Row(
-                children: [
-                  const Expanded(flex: 10, child: SizedBox()),
-                  Expanded(
-                    flex: 25,
-                    child: Column(
-                      children: [
-                        DropdownButton<String>(
-                          value: difficulte,
-                          icon: const Icon(Icons.arrow_downward),
-                          elevation: 8,
-                          style: const TextStyle(color: Colors.deepPurple),
-                          underline: Container(
-                            height: 2,
-                            color: Colors.deepPurpleAccent,
-                          ),
-                          onChanged: (String? value) {
-                            // This is called when the user selects an item.
-                            setState(() {
-                              difficulte = value!;
-                            });
+              const Expanded(flex: 1, child: SizedBox()),
+              start
+                  ? Expanded(
+                      flex: 24,
+                      child: Center(
+                        child: SizedBox(
+                            child: Image.network(
+                          urlimg,
+                          fit: BoxFit.contain,
+                          errorBuilder: (BuildContext context, Object exception,
+                              StackTrace? stackTrace) {
+                            return Image.network('https://picsum.photos/512');
                           },
-                          items: dropdownItems,
-                        ),
-                      ],
+                        )),
+                      ))
+                  : Expanded(
+                      flex: 23,
+                      child: Row(
+                        children: [
+                          const Expanded(flex: 10, child: SizedBox()),
+                          Expanded(
+                            flex: 25,
+                            child: Column(
+                              children: [
+                                DropdownButton<String>(
+                                  value: difficulte,
+                                  icon: const Icon(Icons.arrow_downward),
+                                  elevation: 8,
+                                  style:
+                                      const TextStyle(color: Colors.deepPurple),
+                                  underline: Container(
+                                    height: 2,
+                                    color: Colors.deepPurpleAccent,
+                                  ),
+                                  onChanged: start
+                                      ? null
+                                      : (String? value) {
+                                          // This is called when the user selects an item.
+                                          setState(() {
+                                            difficulte = value!;
+                                          });
+                                        },
+                                  items: dropdownItems,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Expanded(flex: 5, child: SizedBox()),
+                          Expanded(
+                              flex: 60,
+                              child: SizedBox(
+                                  child: Image.network(
+                                urlimg,
+                                fit: BoxFit.contain,
+                                errorBuilder: (BuildContext context,
+                                    Object exception, StackTrace? stackTrace) {
+                                  return Image.network(
+                                      'https://picsum.photos/512');
+                                },
+                              ))),
+                        ],
+                      ),
                     ),
-                  ),
-                  const Expanded(flex: 5, child: SizedBox()),
-                  Expanded(
-                      flex: 60,
-                      child: SizedBox(
-                          child: Image.network(
-                        urlimg,
-                        fit: BoxFit.contain,
-                        errorBuilder: (BuildContext context, Object exception,
-                            StackTrace? stackTrace) {
-                          return Image.network('https://picsum.photos/512');
-                        },
-                      ))),
-                ],
-              ),
+              const Expanded(flex: 5, child: SizedBox()),
+            ],
+          ),
+          Align(
+            alignment: Alignment.topCenter,
+            child: ConfettiWidget(
+              confettiController: _controllerCenter,
+              blastDirectionality: BlastDirectionality.explosive,
+              numberOfParticles: 50,
+              colors: const [
+                Colors.green,
+                Colors.blue,
+                Colors.pink,
+                Colors.orange,
+                Colors.purple
+              ],
             ),
-            const Expanded(flex: 5, child: SizedBox()),
-          ],
-        ),
+          ),
+        ]),
       ),
     );
   }
@@ -338,6 +463,7 @@ class _Taquin extends State<Taquin> {
           tiles[index] = tiles[indexEmpty];
           tiles[indexEmpty] = temp;
           indexEmpty = index;
+          nombrecoups += 1;
         });
         return true;
       } else {
@@ -355,6 +481,8 @@ class _Taquin extends State<Taquin> {
         return false;
       }
     }
+    _controllerCenter.play();
+    txtstart = "Restart";
     return true;
   }
 }
