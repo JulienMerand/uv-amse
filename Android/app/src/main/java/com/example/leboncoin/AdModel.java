@@ -1,6 +1,8 @@
 package com.example.leboncoin;
 
-public class AdModel {
+import java.io.Serializable;
+
+public class AdModel implements Serializable {
     private String title;
     private String address;
     private int image;
