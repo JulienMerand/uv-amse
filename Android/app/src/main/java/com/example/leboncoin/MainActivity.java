@@ -15,7 +15,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button btn_list = (Button) findViewById(R.id.btn_list);
-        Button btn_add = (Button) findViewById(R.id.btn_add);
 
         btn_list.setOnClickListener(new View.OnClickListener(){
             @Override
@@ -24,13 +23,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(goListViewActivity);
             }
         });
-        btn_add.setOnClickListener(new View.OnClickListener(){
-            @Override
-            public void onClick(View view){
-                Intent goAdAddActivity = new Intent(MainActivity.this, AdAddActivity.class);
-                startActivity(goAdAddActivity);
-            }
-        });
+
     }
 
 

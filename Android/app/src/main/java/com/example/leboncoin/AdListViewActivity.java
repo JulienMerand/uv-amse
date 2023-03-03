@@ -1,35 +1,42 @@
 package com.example.leboncoin;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.widget.Button;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class AdListViewActivity extends AppCompatActivity {
 
     ArrayList<AdModel> ListModel = new ArrayList();
 
-    AdModel M1 = new AdModel("Model1", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M2 = new AdModel("Model2", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M3 = new AdModel("Model3", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M4 = new AdModel("Model4", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M5 = new AdModel("Model5", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M6 = new AdModel("Model6", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M7 = new AdModel("Model7", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M8 = new AdModel("Model8", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M9 = new AdModel("Model9", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
-    AdModel M10 = new AdModel("Model10", "2, clos du pré 57530 Courcelles-Chaussy", R.drawable.image0);
+    AdModel M1 = new AdModel("Model1", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M2 = new AdModel("Model2", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M3 = new AdModel("Model3", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M4 = new AdModel("Model4", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M5 = new AdModel("Model5", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M6 = new AdModel("Model6", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M7 = new AdModel("Model7", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M8 = new AdModel("Model8", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M9 = new AdModel("Model9", "Courcelles-Chaussy, 57530", R.drawable.image0);
+    AdModel M10 = new AdModel("Model10", "Courcelles-Chaussy, 57530", R.drawable.image0);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listview_ad);
+
+        Intent i = getIntent();
+        AdModel model = (AdModel) i.getSerializableExtra("add_model");
+        if(model != null){
+            ListModel.add(model);
+        }
 
         ListModel.add(M1);
         ListModel.add(M2);
@@ -42,16 +49,20 @@ public class AdListViewActivity extends AppCompatActivity {
         ListModel.add(M9);
         ListModel.add(M10);
 
-        AdAdapter adapter = new AdAdapter(this, ListModel);
+        RecyclerViewAdAdapter adapter = new RecyclerViewAdAdapter(this, ListModel);
 
-        ListView listview = (ListView) findViewById(R.id.listview);
-        listview.setAdapter(adapter);
-        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        GridLayoutManager GridLayout = new GridLayoutManager(this,2);
+
+        RecyclerView recyclerview = (RecyclerView) findViewById(R.id.RecyclerView);
+        recyclerview.setLayoutManager(GridLayout);
+        recyclerview.setAdapter(adapter);
+
+        Button button_add = (Button) findViewById(R.id.button_add);
+        button_add.setOnClickListener(new View.OnClickListener(){
             @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
-                Intent goAdViewActivity = new Intent(AdListViewActivity.this, AdViewActivity.class);
-                goAdViewActivity.putExtra("okok", ListModel.get(position));
-                startActivity(goAdViewActivity);
+            public void onClick(View view){
+                Intent goAdAddActivity = new Intent(AdListViewActivity.this, AdAddActivity.class);
+                startActivity(goAdAddActivity);
             }
         });
 

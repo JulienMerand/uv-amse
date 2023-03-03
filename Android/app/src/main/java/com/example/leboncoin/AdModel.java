@@ -18,7 +18,7 @@ public class AdModel implements Serializable {
     public String getAddress() {
         return address;
     }
-    public int getID() {
+    public int getImage() {
         return image;
     }
     public void setTitle(String title) {

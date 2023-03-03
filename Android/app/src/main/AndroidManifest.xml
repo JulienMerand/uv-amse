@@ -26,6 +26,9 @@
         <activity
             android:name=".AdAddActivity"
             android:exported="false" />
+        <activity
+            android:name=".AdViewActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

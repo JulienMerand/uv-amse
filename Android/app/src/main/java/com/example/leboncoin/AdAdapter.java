@@ -27,7 +27,7 @@ public class AdAdapter extends BaseAdapter {
     @Override
     public long getItemId(int i) { // Return ad id i
         for(int k=0; k<getCount(); k++) {
-            if(getItem(k).getID()==i) {
+            if(getItem(k).getImage()==i) {
                 return i;
             }
         }
@@ -42,7 +42,7 @@ public class AdAdapter extends BaseAdapter {
         ImageView imageIV = view.findViewById(R.id.imageView);
         TextView titleTV = view.findViewById(R.id.txt_title);
         TextView addressTV = view.findViewById(R.id.txt_address);
-        imageIV.setImageResource(ad.getID());
+        imageIV.setImageResource(ad.getImage());
         titleTV.setText(ad.getTitle());
         addressTV.setText(ad.getAddress());
         return view;
