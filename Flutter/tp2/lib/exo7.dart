@@ -36,12 +36,13 @@ class _Taquin extends State<Taquin> {
   List tiles = [];
   bool start = false;
   int nombrecoups = 0;
-  String txtstart = "Start";
+  List oldempty = [];
+  IconData iconstart = Icons.play_arrow;
   String difficulte = "Easy";
   List listdifficulte = ["Easy", "Medium", "Hard"];
   String urlimg = "";
   late ConfettiController _controllerCenter;
-  List<List<Widget>> historique = [];
+  List historique = [];
 
   List<DropdownMenuItem<String>> get dropdownItems {
     List<DropdownMenuItem<String>> menuItems = [
@@ -74,27 +75,32 @@ class _Taquin extends State<Taquin> {
     }
     ti.removeAt(indexEmpty);
     ti.insert(indexEmpty, emptytile);
+    setState(() {
+      print("Clear history");
+      historique.clear();
+      historique.add(ti);
+    });
     return ti;
   }
 
-  List<Widget> tileslist(gridvalue, nombrecoups) {
+  List<Widget> tileslist(int gridvalue) {
+    print("Historique : ${historique.length} | Empty : $indexEmpty");
     List<Widget> cur = List.generate(
-      gridvalue.round() * gridvalue.round(),
+      gridvalue * gridvalue,
       (index) => InkWell(
-          child: tiles[index][0],
+          child: historique[historique.length - 1][index][0],
           onTap: () {
-            if (!gagne()) {
-              swaptiles(index);
-            }
-            if (start & gagne()) {
-              print("Gagné !");
+            if (start) {
+              setState(() {
+                gagne() ? iconstart = Icons.replay : swaptiles(index);
+              });
             }
           }),
     );
     return cur;
   }
 
-  void melanger(List tiles, String diff) {
+  void melanger(String diff) {
     final random = Random();
     int index;
     int oldindex = indexEmpty;
@@ -130,7 +136,7 @@ class _Taquin extends State<Taquin> {
       }
       oldindex = indexEmpty;
       // print("je swap $index avec la case vide $indexEmpty, oldindex = $oldindex");
-      bool ret = swaptiles(index);
+      bool ret = swaptiles(index, save: false);
       if (!ret) {
         i--;
         setState(() {
@@ -139,6 +145,9 @@ class _Taquin extends State<Taquin> {
         // print("swap impossible, case vide : $indexEmpty");
       }
     }
+    setState(() {
+      historique.add(tiles);
+    });
     print("Grille melangé ! A vous de jouer !");
   }
 
@@ -173,21 +182,21 @@ class _Taquin extends State<Taquin> {
         ),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.teal,
-          child: Text(txtstart),
+          child: Icon(iconstart),
           onPressed: () {
             setState(() {
               start = !start;
               if (start) {
-                melanger(tiles, difficulte);
-                txtstart = "Stop";
-                nombrecoups = 0;
+                melanger(difficulte);
+                iconstart = gagne() ? Icons.replay : Icons.stop;
+                nombrecoups = 1;
               }
               if (!start) {
-                txtstart = "Start";
+                iconstart = Icons.play_arrow;
                 indexEmpty = 0;
                 nombrecoups = 0;
                 tiles = initlist(_gridvalue.round());
-                tileslist(_gridvalue.round(), nombrecoups);
+                tileslist(_gridvalue.round());
               }
             });
           },
@@ -212,7 +221,8 @@ class _Taquin extends State<Taquin> {
                                 Container(
                                   margin: const EdgeInsets.only(
                                       left: 10.0, right: 10.0),
-                                  child: Text("Nombre de coups : $nombrecoups",
+                                  child: Text(
+                                      "Nombre de coups : ${nombrecoups - 1}",
                                       style: const TextStyle(
                                         fontSize: 17,
                                         fontWeight: FontWeight.bold,
@@ -242,21 +252,24 @@ class _Taquin extends State<Taquin> {
                                 Container(
                                   margin: const EdgeInsets.only(left: 10),
                                   color: Colors.white,
-                                  child: Text("Nombre de coups : $nombrecoups",
+                                  child: Text(
+                                      "Nombre de coups : ${nombrecoups - 1}",
                                       style: const TextStyle(
                                         fontSize: 17,
                                         fontWeight: FontWeight.bold,
                                       )),
                                 ),
                                 const Expanded(child: SizedBox()),
-                                (nombrecoups == 0)
+                                (nombrecoups <= 1)
                                     ? const SizedBox()
                                     : TextButton(
                                         onPressed: () {
                                           setState(() {
-                                            if (nombrecoups > 0) {
+                                            if (nombrecoups > 1) {
+                                              historique.removeLast();
                                               nombrecoups--;
-                                              print("Mouvement précédent");
+                                              indexEmpty =
+                                                  oldempty.removeLast();
                                             }
                                           });
                                         },
@@ -298,7 +311,7 @@ class _Taquin extends State<Taquin> {
                                 if (!start) {
                                   _gridvalue = value;
                                   tiles = initlist(_gridvalue.round());
-                                  tileslist(_gridvalue.round(), nombrecoups);
+                                  tileslist(_gridvalue.round());
                                 }
                               });
                             },
@@ -330,7 +343,6 @@ class _Taquin extends State<Taquin> {
                       ],
               ),
             ),
-            const SizedBox(height: 5.0),
           ],
         ),
         body: Stack(children: [
@@ -344,7 +356,7 @@ class _Taquin extends State<Taquin> {
                   crossAxisSpacing: 2,
                   mainAxisSpacing: 2,
                   crossAxisCount: _gridvalue.round(),
-                  children: tileslist(_gridvalue.round(), nombrecoups),
+                  children: tileslist(_gridvalue.round()),
                 ),
               ),
               const Expanded(flex: 1, child: SizedBox()),
@@ -433,7 +445,7 @@ class _Taquin extends State<Taquin> {
     );
   }
 
-  bool swaptiles(index) {
+  bool swaptiles(int index, {bool save = true}) {
     if (start) {
       List indexpossible = [
         indexEmpty - 1,
@@ -459,14 +471,24 @@ class _Taquin extends State<Taquin> {
       }
       if (indexpossible.contains(index)) {
         setState(() {
-          List temp = tiles[index];
-          tiles[index] = tiles[indexEmpty];
-          tiles[indexEmpty] = temp;
+          if (save) {
+            List copy = List.from(historique[historique.length - 1]);
+            List temp = copy[index];
+            copy[index] = copy[indexEmpty];
+            copy[indexEmpty] = temp;
+            historique.add(copy);
+            oldempty.add(indexEmpty);
+            nombrecoups += 1;
+          } else {
+            List temp = tiles[index];
+            tiles[index] = tiles[indexEmpty];
+            tiles[indexEmpty] = temp;
+          }
           indexEmpty = index;
-          nombrecoups += 1;
         });
         return true;
       } else {
+        print("Mouvement impossible ! ");
         return false;
       }
     } else {
@@ -477,12 +499,11 @@ class _Taquin extends State<Taquin> {
 
   bool gagne() {
     for (var i = 0; i < _gridvalue.round() * _gridvalue.round(); i++) {
-      if (i != tiles[i][1]) {
+      if (i != historique[historique.length - 1][i][1]) {
         return false;
       }
     }
     _controllerCenter.play();
-    txtstart = "Restart";
     return true;
   }
 }
