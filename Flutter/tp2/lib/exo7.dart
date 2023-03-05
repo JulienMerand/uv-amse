@@ -109,13 +109,13 @@ class _Taquin extends State<Taquin> {
 
     switch (diff) {
       case "Easy":
-        nbcoups = 10 * _gridvalue.round() * _gridvalue.round();
+        nbcoups = 10;
         break;
       case "Medium":
-        nbcoups = 100 * _gridvalue.round() * _gridvalue.round();
+        nbcoups = 50;
         break;
       case "Hard":
-        nbcoups = 500 * _gridvalue.round() * _gridvalue.round();
+        nbcoups = 500;
         break;
       default:
         throw UnimplementedError('no widget for $diff');
