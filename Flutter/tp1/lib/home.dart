@@ -27,8 +27,6 @@ class Favorites extends StatelessWidget {
 
     List fav = appState.favorites;
     List favTitres = appState.favtitre;
-    // print(Titres);
-    // print(fav);
 
     return ListView(
       primary: false,
