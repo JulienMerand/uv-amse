@@ -20,7 +20,7 @@
 
 #define STR_LEN 256
 
-double *var_u;
+double *var_Tv;
 
 void usage(char *);
 
@@ -33,9 +33,9 @@ void usage(char *szPgmName) {
 
 int main(int argc, char *argv[]) {
     
-    char CommandMem[STR_LEN];
-    int iAreaCmd;
-    double u;
+    char TargetMem[STR_LEN];
+    int iAreaTarget;
+    double Tv;
     char idmotor;
 
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
         usage(argv[0]);
         return(0);
     }
-    if ((sscanf(argv[1], "%lf", &u) == 0) || (sscanf(argv[2], "%c", &idmotor) == 0)) {
+    if ((sscanf(argv[1], "%lf", &Tv) == 0) || (sscanf(argv[2], "%c", &idmotor) == 0)) {
         fprintf(stderr, " main() : ERREUR ---> format des arguments incorrect \n");
         usage(argv[0]);
         return(0);
@@ -53,31 +53,31 @@ int main(int argc, char *argv[]) {
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
     /*        Zones de memoires partagees       */
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-    sprintf(CommandMem, "STATE_%c", idmotor);
+    sprintf(TargetMem, "TARGET_%c", idmotor);
 
-    if(( iAreaCmd = shm_open(CommandMem, O_RDWR, 0600)) < 0) {
+    if(( iAreaTarget = shm_open(TargetMem, O_RDWR, 0600)) < 0) {
         fprintf(stderr,"%s.main() :  ERREUR ---> appel a shm_open() #1\n", argv[0]);
         fprintf(stderr,"             code = %d (%s)\n", errno, (char *)(strerror(errno)));
         exit( -errno );
     } else {
-        printf("LIEN a la zone %s\n", CommandMem);
+        printf("LIEN a la zone %s\n", TargetMem);
     };
 
-    if( ftruncate(iAreaCmd, sizeof(double)) < 0 )
+    if( ftruncate(iAreaTarget, sizeof(double)) < 0 )
     {
         fprintf(stderr,"%s.main() :  ERREUR ---> appel a ftruncate() #1\n", argv[0]);
         fprintf(stderr,"             code = %d (%s)\n", errno, (char *)(strerror(errno)));
         exit( -errno );
     };
 
-    if((var_u = (double *)(mmap(NULL, sizeof(double), PROT_READ | PROT_WRITE, MAP_SHARED, iAreaCmd, 0))) == MAP_FAILED )
+    if((var_Tv = (double *)(mmap(NULL, sizeof(double), PROT_READ | PROT_WRITE, MAP_SHARED, iAreaTarget, 0))) == MAP_FAILED )
     {
         fprintf(stderr,"%s.main() :  ERREUR ---> appel a mmap() #1\n", argv[0]);
         fprintf(stderr,"             code = %d (%s)\n", errno, (char *)(strerror(errno)));
         exit( -errno );
     };
 
-    *var_u = u;
+    *var_Tv = Tv;
     return(0);
 
 }
