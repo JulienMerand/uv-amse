@@ -42,7 +42,7 @@
             android:layout_height="wrap_content"
             android:paddingTop="5dp"
             android:text="Titre"
-            android:textColor="#000000"
+            android:textColor="@color/black"
             android:textSize="20sp"
             android:textStyle="bold" />
 
