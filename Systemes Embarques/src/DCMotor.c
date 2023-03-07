@@ -149,10 +149,10 @@ int main(int argc, char *argv[]) {
     init(r,l,ke,km,f,j,te);
 
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-    /* Creation des zones de memoires partagees */
+    /*        Zones de memoires partagees       */
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-    sprintf(CommandMem, "STATE_%c", idmotor);
-    sprintf(StateMem, "COMMAND_%c", idmotor);
+    sprintf(CommandMem, "COMMAND_%c", idmotor);
+    sprintf(StateMem, "STATE_%c", idmotor);
 
     /* CommandMem */
     if(( iAreaCmd = shm_open(CommandMem, O_RDWR, 0600)) < 0) {

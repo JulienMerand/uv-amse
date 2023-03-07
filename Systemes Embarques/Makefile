@@ -1,4 +1,4 @@
-all : ./obj/DCMotor.o ./bin/DCMotor ./obj/SetU.o ./bin/SetU
+all : ./obj/DCMotor.o ./bin/DCMotor ./obj/SetU.o ./bin/SetU ./obj/ResetState.o ./bin/ResetState
 
 # DCMotor
 ./obj/DCMotor.o : ./src/DCMotor.c
@@ -12,3 +12,8 @@ all : ./obj/DCMotor.o ./bin/DCMotor ./obj/SetU.o ./bin/SetU
 ./bin/SetU : ./obj/SetU.o
 		gcc ./obj/SetU.o -o ./bin/SetU
 
+# ResetState
+./obj/ResetState.o : ./src/ResetState.c
+		gcc ./src/ResetState.c -c -o ./obj/ResetState.o
+./bin/ResetState : ./obj/ResetState.o
+		gcc ./obj/ResetState.o -o ./bin/ResetState

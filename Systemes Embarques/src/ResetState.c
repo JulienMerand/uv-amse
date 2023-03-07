@@ -7,20 +7,17 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <errno.h>
-#include <signal.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/types.h> 
-#include <sys/time.h>  
 #include <ctype.h>
+#include <math.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <errno.h>
 #include <sys/mman.h>
-#include <sys/stat.h>
+#include <sys/time.h>
+#include <stdbool.h>
 
 #define STR_LEN 256
-
-double *var_u;
 
 void usage(char *);
 
@@ -28,56 +25,63 @@ void usage(char *szPgmName) {
     if(szPgmName == NULL) {
         exit(-1);
     }
-    printf("%s <value> <motor (L | R) >\n", szPgmName);
+    printf("%s <motor (L | R) >\n", szPgmName);
 }
 
 int main(int argc, char *argv[]) {
-    
-    char CommandMem[STR_LEN];
-    int iAreaCmd;
-    double u;
+
+    int iAreaState;
     char idmotor;
+    char StateMem[STR_LEN];
+    double *var_state;
 
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
     /*        Verification des arguments        */
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-    if(argc != 3){
+    if( argc != 2)
+    {
         usage(argv[0]);
-        return(0);
-    }
-    if ((sscanf(argv[1], "%lf", &u) == 0) || (sscanf(argv[2], "%c", &idmotor) == 0)) {
-        fprintf(stderr, " main() : ERREUR ---> format des arguments incorrect \n");
+        return( 0 );
+    };
+
+    if( sscanf(argv[1],"%c",&idmotor) == 0 )
+    {
+        fprintf(stderr,"%s.main()  : ERREUR ---> l'argument #1 doit etre un caractere\n", argv[0]);
         usage(argv[0]);
-        return(0);
-    }
+        return( 0 );
+    };
+
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
     /*        Zones de memoires partagees       */
     /*&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&*/
-    sprintf(CommandMem, "STATE_%c", idmotor);
 
-    if(( iAreaCmd = shm_open(CommandMem, O_RDWR, 0600)) < 0) {
+    sprintf(StateMem, "COMMAND_%c", idmotor);
+
+    if(( iAreaState = shm_open(StateMem, O_RDWR | O_CREAT, 0600)) < 0)
+    {
         fprintf(stderr,"%s.main() :  ERREUR ---> appel a shm_open() #1\n", argv[0]);
         fprintf(stderr,"             code = %d (%s)\n", errno, (char *)(strerror(errno)));
         exit( -errno );
-    } else {
-        printf("LIEN a la zone %s\n", CommandMem);
+    }
+    else
+    {
+        printf("LIEN a la zone %s\n", StateMem);
     };
 
-    if( ftruncate(iAreaCmd, sizeof(double)) < 0 )
+    if( ftruncate(iAreaState, 2 * sizeof(double)) < 0)
     {
         fprintf(stderr,"%s.main() :  ERREUR ---> appel a ftruncate() #1\n", argv[0]);
         fprintf(stderr,"             code = %d (%s)\n", errno, (char *)(strerror(errno)));
         exit( -errno );
     };
 
-    if((var_u = (double *)(mmap(NULL, sizeof(double), PROT_READ | PROT_WRITE, MAP_SHARED, iAreaCmd, 0))) == MAP_FAILED )
+    if((var_state = (double *)(mmap(NULL, 2 * sizeof(double), PROT_READ | PROT_WRITE, MAP_SHARED, iAreaState, 0))) == MAP_FAILED )
     {
         fprintf(stderr,"%s.main() :  ERREUR ---> appel a mmap() #1\n", argv[0]);
         fprintf(stderr,"             code = %d (%s)\n", errno, (char *)(strerror(errno)));
         exit( -errno );
     };
 
-    *var_u = u;
+    memset(var_state,0, 2 * sizeof(double));
     return(0);
-
 }
