@@ -3,7 +3,9 @@ Julien MÉRAND - FISE2024
 
 ## Développement Android 
 
-Le dossier contient une application développée sous **Android Studio**. 
+Les deux dossiers Android et Android2 correspondent à deux versions différentes : une développé seul et l'autre en binôme.
+
+Les dossiers contiennent une application développée sous **Android Studio**. 
 Cette application est inspiré du site `leboncoin` et permet l'achat/revente fictif de matériaux de constructions.
 
 ## Développement Web Mobile - Flutter
