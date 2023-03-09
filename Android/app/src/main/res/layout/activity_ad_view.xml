@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".AdViewActivity">
+
+
+    <com.google.android.material.imageview.ShapeableImageView
+
+
+
+
+        android:id="@+id/adViewImage"
+        android:src="@drawable/image0"
+        android:layout_width="wrap_content"
+        android:layout_height="290dp"
+        android:scaleType="centerCrop"
+
+
+        app:layout_constraintTop_toTopOf="parent"
+
+
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+
+        >
+
+    </com.google.android.material.imageview.ShapeableImageView>
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Titre annonce"
+        app:layout_constraintTop_toBottomOf="@id/adViewImage"
+        android:id="@+id/adViewTitle"
+        android:textColor="@color/black"
+        android:textSize="36sp"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginTop="16dp"
+
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+
+
+
+
+        />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/adViewTitle"
+        android:paddingHorizontal="16dp"
+        android:layout_marginTop="6dp"
+        android:id="@+id/dataContainer">
+
+
+        <ImageView
+            android:layout_width="22dp"
+            android:layout_height="22dp"
+            android:src="@drawable/baseline_place_24"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:id="@+id/addressIcon"
+            app:layout_constraintRight_toLeftOf="@id/dataAddressText"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=""
+
+            android:id="@+id/dataAddressText"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintLeft_toRightOf="@id/addressIcon"
+
+            android:textSize="16sp"/>
+
+
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textStyle="bold"
+            android:textAlignment="textEnd"
+            android:id="@+id/dataPriceText"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            android:textSize="16sp"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+
+        app:layout_constraintTop_toBottomOf="@id/dataContainer"
+        android:text="Acheter"
+        android:id="@+id/adDataPrice"
+        app:layout_constraintRight_toRightOf="parent"
+        android:layout_marginHorizontal="16dp"
+        android:drawableRight="@drawable/baseline_shopping_basket_24">
+
+
+    </Button>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
