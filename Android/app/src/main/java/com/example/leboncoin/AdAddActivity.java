@@ -35,7 +35,7 @@ public class AdAddActivity extends AppCompatActivity {
                 String address = inputlayout2.getEditText().getText().toString();
                 if(titre!=null & address!=null){
                     AdModel model = new AdModel(titre, address, R.drawable.image_add);
-                    Intent goListViewActivity = new Intent(AdAddActivity.this, AdListViewActivity.class);
+                    Intent goListViewActivity = new Intent(AdAddActivity.this, MainActivity.class);
                     goListViewActivity.putExtra("add_model", model);
                     startActivity(goListViewActivity);
                 }
