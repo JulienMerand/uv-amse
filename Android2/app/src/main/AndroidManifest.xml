@@ -12,8 +12,16 @@
         android:theme="@style/Theme.TPLeBonCoin"
         tools:targetApi="31">
         <activity
+            android:name=".AdViewActivity"
+            android:exported="false" />
+        <activity
+            android:name=".CreateAdActivity"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="true"
+            android:label="@string/app_name"
+            android:theme="@style/Theme.TPLeBonCoin.NoActionBar" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
