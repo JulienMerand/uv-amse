@@ -32,11 +32,14 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 public class MainActivity extends AppCompatActivity {
 
+
+    public static File CACHE_DIR;
     private AppBarConfiguration appBarConfiguration;
     private ActivityMainBinding binding;
 
@@ -50,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
+        CACHE_DIR = getApplication().getCacheDir();
 
 
         Intent intent = getIntent();
